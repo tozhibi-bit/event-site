@@ -131,9 +131,16 @@ function openModal({ id, title, date, location }) {
   successPanel.classList.add('hidden');
   form.classList.remove('hidden');
 
+  // 前回入力した名前・メールを自動入力
+  const saved = loadProfile();
+  if (saved.name)  document.getElementById('field-name').value  = saved.name;
+  if (saved.email) document.getElementById('field-email').value = saved.email;
+
   overlay.classList.remove('hidden');
   document.body.style.overflow = 'hidden';
-  document.getElementById('field-name').focus();
+
+  // 入力済みなら備考欄にフォーカス、未入力なら名前欄に
+  document.getElementById(saved.name ? 'field-note' : 'field-name').focus();
 }
 
 function closeModal() {
@@ -178,6 +185,8 @@ form.addEventListener('submit', async e => {
     const data = await res.json();
 
     if (data.status === 'ok') {
+      // 入力情報をブラウザに保存
+      saveProfile(payload.name, payload.email);
       form.classList.add('hidden');
       successPanel.classList.remove('hidden');
     } else {
@@ -252,6 +261,19 @@ function escape(str) {
   return String(str ?? '').replace(/[&<>"']/g, c => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
   }[c]));
+}
+
+// ── プロフィール保存（localStorage） ─────────────────────
+function saveProfile(name, email) {
+  try {
+    localStorage.setItem('event_profile', JSON.stringify({ name, email }));
+  } catch(e) {}
+}
+
+function loadProfile() {
+  try {
+    return JSON.parse(localStorage.getItem('event_profile')) || {};
+  } catch(e) { return {}; }
 }
 
 // ── 起動 ─────────────────────────────────────────────────
