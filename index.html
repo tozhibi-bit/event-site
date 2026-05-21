@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>イベント申し込み</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <h1 class="site-title">イベント申し込み</h1>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="event-list-section">
+      <h2 class="section-title">開催予定のイベント</h2>
+      <div id="loading" class="loading-state">
+        <div class="spinner"></div>
+        <p>読み込み中...</p>
+      </div>
+      <div id="error-state" class="error-state hidden">
+        <p>イベント情報の読み込みに失敗しました。<br>しばらくしてから再度お試しください。</p>
+      </div>
+      <div id="empty-state" class="empty-state hidden">
+        <p>現在予定されているイベントはありません。</p>
+      </div>
+      <div id="event-list" class="event-list"></div>
+    </section>
+  </main>
+
+  <!-- 申し込みモーダル -->
+  <div id="modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal">
+      <button class="modal-close" id="modal-close" aria-label="閉じる">&times;</button>
+
+      <div id="modal-event-info" class="modal-event-info">
+        <span class="modal-event-badge">申し込み</span>
+        <h2 id="modal-title" class="modal-event-title"></h2>
+        <div class="modal-event-meta">
+          <span id="modal-date"></span>
+          <span id="modal-location"></span>
+        </div>
+      </div>
+
+      <form id="registration-form" class="registration-form" novalidate>
+        <input type="hidden" id="field-event-id" name="eventId">
+        <input type="hidden" id="field-event-title" name="eventTitle">
+
+        <div class="form-group">
+          <label for="field-name" class="form-label">お名前 <span class="required">*</span></label>
+          <input type="text" id="field-name" name="name" class="form-input" placeholder="山田 太郎" required autocomplete="name">
+          <span class="form-error" id="error-name"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="field-email" class="form-label">メールアドレス <span class="required">*</span></label>
+          <input type="email" id="field-email" name="email" class="form-input" placeholder="example@email.com" required autocomplete="email">
+          <span class="form-error" id="error-email"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="field-note" class="form-label">備考・ご質問</label>
+          <textarea id="field-note" name="note" class="form-textarea" placeholder="アレルギーや質問などあればご記入ください" rows="4"></textarea>
+        </div>
+
+        <div id="form-message" class="form-message hidden"></div>
+
+        <button type="submit" id="submit-btn" class="btn-submit">
+          <span id="submit-label">申し込む</span>
+          <span id="submit-loading" class="hidden">送信中...</span>
+        </button>
+      </form>
+
+      <div id="success-panel" class="success-panel hidden">
+        <div class="success-icon">&#10003;</div>
+        <h3>申し込みが完了しました</h3>
+        <p>ご登録のメールアドレスに確認をお送りします。<br>ご参加をお待ちしております。</p>
+        <button class="btn-secondary" id="back-btn">イベント一覧に戻る</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2025 イベント申し込みサイト</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
