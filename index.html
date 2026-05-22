@@ -48,6 +48,9 @@
       <form id="registration-form" class="registration-form" novalidate>
         <input type="hidden" id="field-event-id" name="eventId">
         <input type="hidden" id="field-event-title" name="eventTitle">
+        <input type="hidden" id="field-event-date" name="eventDate">
+        <input type="hidden" id="field-event-time" name="eventTime">
+        <input type="hidden" id="field-event-location" name="eventLocation">
 
         <div class="form-group">
           <label for="field-name" class="form-label">お名前 <span class="required">*</span></label>
@@ -56,9 +59,22 @@
         </div>
 
         <div class="form-group">
-          <label for="field-email" class="form-label">メールアドレス <span class="required">*</span></label>
-          <input type="email" id="field-email" name="email" class="form-input" placeholder="example@email.com" required autocomplete="email">
-          <span class="form-error" id="error-email"></span>
+          <label class="form-label">参加方法 <span class="required">*</span></label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="attendanceType" value="会場で参加" required>
+              <span>会場で参加</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="attendanceType" value="zoomでリアルタイム参加">
+              <span>zoomでリアルタイム参加</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="attendanceType" value="後日アーカイブ視聴">
+              <span>後日アーカイブ視聴</span>
+            </label>
+          </div>
+          <span class="form-error" id="error-attendance"></span>
         </div>
 
         <div class="form-group">

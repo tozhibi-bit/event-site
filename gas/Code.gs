@@ -26,25 +26,15 @@ function doPost(e) {
       return jsonResponse({ status: 'error', message: '不正なリクエストです' });
     }
 
-    const { eventId, eventTitle, name, email, note } = payload;
+    const { eventId, eventTitle, eventDate, eventTime, eventLocation, name, attendanceType, note } = payload;
 
     // 必須チェック
-    if (!name || !email || !eventId) {
+    if (!name || !eventId || !attendanceType) {
       return jsonResponse({ status: 'error', message: '必須項目が不足しています' });
     }
 
-    // メール形式チェック
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return jsonResponse({ status: 'error', message: 'メールアドレスの形式が正しくありません' });
-    }
-
-    // 重複チェック
-    if (isDuplicate(eventId, email)) {
-      return jsonResponse({ status: 'error', message: 'このメールアドレスはすでに申し込み済みです' });
-    }
-
     // 申込データに保存
-    saveRegistration({ eventId, eventTitle, name, email, note });
+    saveRegistration({ eventId, eventTitle, eventDate, eventTime, eventLocation, name, attendanceType, note });
 
     return jsonResponse({ status: 'ok' });
   } catch (err) {
@@ -118,32 +108,19 @@ function getEvents() {
 }
 
 // ── 申し込みを保存 ────────────────────────────────────────
-function saveRegistration({ eventId, eventTitle, name, email, note }) {
+function saveRegistration({ eventId, eventTitle, eventDate, eventTime, eventLocation, name, attendanceType, note }) {
   const ss    = SpreadsheetApp.openById(SPREADSHEET_ID);
   let sheet   = ss.getSheetByName(SHEET_REGISTRATIONS);
 
   // シートがなければ作成
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_REGISTRATIONS);
-    sheet.appendRow(['申込日時', 'イベントID', 'イベント名', 'お名前', 'メールアドレス', '備考']);
+    sheet.appendRow(['申込日時', 'イベントID', 'イベント名', 'お名前', '参加方法', '備考']);
     sheet.getRange(1, 1, 1, 6).setFontWeight('bold');
   }
 
   const now = Utilities.formatDate(new Date(), 'Asia/Tokyo', 'yyyy/MM/dd HH:mm:ss');
-  sheet.appendRow([now, eventId, eventTitle, name, email, note || '']);
-}
-
-// ── 重複チェック ──────────────────────────────────────────
-function isDuplicate(eventId, email) {
-  const ss    = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sheet = ss.getSheetByName(SHEET_REGISTRATIONS);
-  if (!sheet) return false;
-
-  const data = sheet.getDataRange().getValues();
-  for (let i = 1; i < data.length; i++) {
-    if (String(data[i][1]) === String(eventId) && data[i][4] === email) return true;
-  }
-  return false;
+  sheet.appendRow([now, eventId, eventTitle, name, attendanceType || '', note || '']);
 }
 
 // ── ユーティリティ ────────────────────────────────────────

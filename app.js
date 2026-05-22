@@ -101,7 +101,8 @@ function renderEvents(events) {
       <div class="event-card-footer">
         <span></span>
         <button class="btn-apply" data-id="${ev.id}" data-title="${escape(ev.title)}"
-          data-date="${escape(formatDateTime(ev.date, ev.time))}" data-location="${escape(ev.location || '')}">
+          data-date="${escape(formatDateTime(ev.date, ev.time))}" data-location="${escape(ev.location || '')}"
+          data-raw-date="${ev.date}" data-raw-time="${ev.time || ''}">
           申し込む
         </button>
       </div>
@@ -116,9 +117,12 @@ function renderEvents(events) {
 }
 
 // ── モーダル ──────────────────────────────────────────────
-function openModal({ id, title, date, location }) {
-  document.getElementById('field-event-id').value    = id;
-  document.getElementById('field-event-title').value = title;
+function openModal({ id, title, date, location, rawDate, rawTime }) {
+  document.getElementById('field-event-id').value       = id;
+  document.getElementById('field-event-title').value    = title;
+  document.getElementById('field-event-date').value     = rawDate  || '';
+  document.getElementById('field-event-time').value     = rawTime  || '';
+  document.getElementById('field-event-location').value = location || '';
   modalTitle.textContent    = title;
   modalDate.textContent     = date ? `&#128197; ${date}` : '';
   modalLocation.textContent = location ? `&#128205; ${location}` : '';
@@ -167,13 +171,18 @@ form.addEventListener('submit', async e => {
   setSubmitting(true);
   formMessage.classList.add('hidden');
 
+  const attendanceType = document.querySelector('input[name="attendanceType"]:checked')?.value || '';
+
   const payload = {
-    action:     'register',
-    eventId:    document.getElementById('field-event-id').value,
-    eventTitle: document.getElementById('field-event-title').value,
-    name:       document.getElementById('field-name').value.trim(),
-    email:      document.getElementById('field-email').value.trim(),
-    note:       document.getElementById('field-note').value.trim(),
+    action:         'register',
+    eventId:        document.getElementById('field-event-id').value,
+    eventTitle:     document.getElementById('field-event-title').value,
+    eventDate:      document.getElementById('field-event-date').value,
+    eventTime:      document.getElementById('field-event-time').value,
+    eventLocation:  document.getElementById('field-event-location').value,
+    name:           document.getElementById('field-name').value.trim(),
+    attendanceType: attendanceType,
+    note:           document.getElementById('field-note').value.trim(),
   };
 
   try {
@@ -186,7 +195,7 @@ form.addEventListener('submit', async e => {
 
     if (data.status === 'ok') {
       // 入力情報をブラウザに保存
-      saveProfile(payload.name, payload.email);
+      saveProfile(payload.name);
       form.classList.add('hidden');
       successPanel.classList.remove('hidden');
     } else {
@@ -205,19 +214,16 @@ function validate() {
   clearErrors();
   let ok = true;
 
-  const name  = document.getElementById('field-name');
-  const email = document.getElementById('field-email');
+  const name       = document.getElementById('field-name');
+  const attendance = document.querySelector('input[name="attendanceType"]:checked');
 
   if (!name.value.trim()) {
     showFieldError(name, 'error-name', 'お名前を入力してください');
     ok = false;
   }
 
-  if (!email.value.trim()) {
-    showFieldError(email, 'error-email', 'メールアドレスを入力してください');
-    ok = false;
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
-    showFieldError(email, 'error-email', 'メールアドレスの形式が正しくありません');
+  if (!attendance) {
+    document.getElementById('error-attendance').textContent = '参加方法を選択してください';
     ok = false;
   }
 
@@ -232,6 +238,8 @@ function showFieldError(input, errorId, msg) {
 function clearErrors() {
   document.querySelectorAll('.form-input, .form-textarea').forEach(el => el.classList.remove('invalid'));
   document.querySelectorAll('.form-error').forEach(el => el.textContent = '');
+  const attendanceError = document.getElementById('error-attendance');
+  if (attendanceError) attendanceError.textContent = '';
 }
 
 function showFormError(msg) {
@@ -264,9 +272,9 @@ function escape(str) {
 }
 
 // ── プロフィール保存（localStorage） ─────────────────────
-function saveProfile(name, email) {
+function saveProfile(name) {
   try {
-    localStorage.setItem('event_profile', JSON.stringify({ name, email }));
+    localStorage.setItem('event_profile', JSON.stringify({ name }));
   } catch(e) {}
 }
 
