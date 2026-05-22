@@ -135,10 +135,13 @@ function openModal({ id, title, date, location, rawDate, rawTime }) {
   successPanel.classList.add('hidden');
   form.classList.remove('hidden');
 
-  // 前回入力した名前・メールを自動入力
+  // 場所に「zoom」が含まれる場合はラジオボタンを2択に切り替え
+  const isZoom = /zoom/i.test(location || '');
+  document.getElementById('radio-venue').closest('.radio-label').style.display = isZoom ? 'none' : '';
+
+  // 前回入力した名前を自動入力
   const saved = loadProfile();
-  if (saved.name)  document.getElementById('field-name').value  = saved.name;
-  if (saved.email) document.getElementById('field-email').value = saved.email;
+  if (saved.name) document.getElementById('field-name').value = saved.name;
 
   overlay.classList.remove('hidden');
   document.body.style.overflow = 'hidden';
