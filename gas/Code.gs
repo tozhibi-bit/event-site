@@ -2,7 +2,7 @@
 //  イベント申し込みサイト — Google Apps Script
 //  スプレッドシートID を SPREADSHEET_ID に設定してください
 // ============================================================
-const SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID';
+const SPREADSHEET_ID = '179mePemkq-8gJ6ca-63khxhuAVE7nnflGcR-7qtmT7w';
 
 const SHEET_EVENTS = 'イベント';       // イベント一覧シート名
 const SHEET_REGISTRATIONS = '申込データ'; // 申込データシート名
